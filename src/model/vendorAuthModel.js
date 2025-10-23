@@ -12,6 +12,11 @@ const vendorSchema = new mongoose.Schema({
   mobile: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+
+  // OTP fields
+  otp: { type: String },
+  otpExpiresAt: { type: Date },
+  lastOtpSent: { type: Date }, // For resend limit
 }, { timestamps: true });
 
 // Hash password before saving
