@@ -4,14 +4,17 @@ import bcrypt from "bcryptjs";
 const vendorSchema = new mongoose.Schema({
   businessName: { type: String, required: true },
   city: { type: String, required: true },
-  vendorType: {
-    type: String,
-    enum: ["Photography", "Decoration", "Makeup", "Catering"],
-    required: true,
-  },
+  vendorType: { type: String, enum: ["Photography", "Decoration", "Makeup", "Catering"], required: true, },
   mobile: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+
+  contactPersonName: { type: String },
+  whatsappNumber: { type: String },
+  address: { type: String },
+  facebookLink: { type: String },
+  instagramLink: { type: String },
+  youtubeLink: { type: String },
 
   // OTP fields
   otp: { type: String },

@@ -1,16 +1,19 @@
 import express from "express";
-import { registerVendor, sendVendorOtp, verifyVendorOtp } from "../controller/vendor/vendorController.js";
+import { registerVendor, sendVendorOtp, verifyVendorOtp, getVendorProfile, updateVendorProfile } from "../controller/vendor/vendorController.js";
 import { vendorAuth } from "../middleware/vendorAuth.js";
 
 const router = express.Router();
+//✅ means successfully worked on postman
 
-router.post("/vendor-register", registerVendor);
-router.post("/vendor-send-otp", sendVendorOtp);     
-router.post("/vendor-verify-otp", verifyVendorOtp);   
+router.post("/vendor-register", registerVendor); //✅
+router.post("/vendor-send-otp", sendVendorOtp); //✅
+router.post("/vendor-verify-otp", verifyVendorOtp); //✅
+router.get("/get-vendor-profile", vendorAuth, getVendorProfile); //✅
+router.put("/update-vendor-profile", vendorAuth, updateVendorProfile); //✅
 
 // Example protected route
 router.get("/vendor-dashboard", vendorAuth, (req, res) => {
-  res.json({ message: `Welcome Vendor ${req.vendor.email}` });
+    res.json({ message: `Welcome Vendor ${req.vendor.email}` });
 });
 
 export default router;

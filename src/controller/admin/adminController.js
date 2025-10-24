@@ -1,6 +1,9 @@
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 dotenv.config();
+import VendorGroup from "../../model/vendorGroupModel.js";
+import Lead from "../../model/leadsModel.js";
+import { sendWhatsappMessage } from "../../utils/sendWhatsapp.js";
 
 export const adminLogin = (req, res) => {
   const { identifier, password } = req.body;
@@ -23,5 +26,58 @@ export const adminLogin = (req, res) => {
     return res.status(200).json({ message: "Admin login successful", token });
   } else {
     return res.status(401).json({ message: "Invalid admin credentials" });
+  }
+};
+
+
+// assingn lead to vendor group members
+export const assignLeadToGroup = async (req, res) => {
+  try {
+    const { groupId, leadId } = req.body;
+
+    // Fetch group with full vendor details
+    const group = await VendorGroup.findById(groupId).populate("members");
+    if (!group) return res.status(404).json({ message: "Vendor group not found" });
+
+    // Fetch lead details
+    const lead = await Lead.findById(leadId);
+    if (!lead) return res.status(404).json({ message: "Lead not found" });
+
+    console.log(` Assigning lead to group: ${group.groupName}`);
+    console.log(` Group members:`, group.members);
+
+    // Send WhatsApp message to each member
+    const sendMessages = group.members.map(async (member) => {
+      const recipient = member.whatsappNumber || member.mobile;
+      if (!recipient) {
+        console.warn(` Member ${member._id} (${member.businessName}) has no WhatsApp number`);
+        return;
+      }
+
+      const message = ` New Lead Assigned!\n
+ Lead ID: ${lead._id}
+ Name: ${lead.name}
+ Contact: ${lead.contact}
+ City: ${lead.city}
+ Service: ${lead.requestedService}
+ Event Date: ${new Date(lead.eventDate).toLocaleString()}
+ Budget: ${lead.eventBudget}
+ Message: ${lead.message}\n
+ Assigned to: ${member.businessName}
+ Time: ${new Date().toLocaleString()}\n
+Please follow up as soon as possible.`;
+
+      await sendWhatsappMessage(recipient, message);
+    });
+
+    await Promise.all(sendMessages);
+
+    res.status(200).json({
+      message: "Lead assigned successfully — WhatsApp messages sent to group members.",
+    });
+
+  } catch (error) {
+    console.error(" Error assigning lead:", error);
+    res.status(500).json({ message: "Error assigning lead", error: error.message });
   }
 };

@@ -5,7 +5,7 @@ import { sendEmail } from "../../utils/sendEmail.js";
 
 dotenv.config();
 
-// Register Vendor
+// register-vendor
 export const registerVendor = async (req, res) => {
   try {
     const { businessName, city, vendorType, mobile, email, password } = req.body;
@@ -25,7 +25,7 @@ export const registerVendor = async (req, res) => {
   }
 };
 
-// Send / Resend OTP
+// send / resend OTP
 export const sendVendorOtp = async (req, res) => {
   try {
     const { email } = req.body;
@@ -55,7 +55,7 @@ export const sendVendorOtp = async (req, res) => {
   }
 };
 
-// Verify OTP
+// verify-OTP
 export const verifyVendorOtp = async (req, res) => {
   try {
     const { email, otp } = req.body;
@@ -80,6 +80,41 @@ export const verifyVendorOtp = async (req, res) => {
     );
 
     res.status(200).json({ message: "OTP verified successfully", token });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// get-vendor-profile
+export const getVendorProfile = async (req, res) => {
+  try {
+    const vendor = await Vendor.findById(req.vendor.vendorId).select("-password -otp -otpExpiresAt -lastOtpSent"); // get vendorAuth
+    if (!vendor) return res.status(404).json({ message: "Vendor not found" });
+
+    res.status(200).json({ vendor });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// update-vendor-profile
+export const updateVendorProfile = async (req, res) => {
+  try {
+    const vendorId = req.vendor.vendorId;
+    const updateData = req.body;
+
+    // Update only allowed fields
+    const allowedFields = ["contactPersonName", "whatsappNumber", "address", "facebookLink", "instagramLink", "youtubeLink", "businessName", "city", "mobile"];
+    const filteredData = {};
+    allowedFields.forEach(field => {
+      if (updateData[field] !== undefined) filteredData[field] = updateData[field];
+    });
+
+    const updatedVendor = await Vendor.findByIdAndUpdate(vendorId, filteredData, { new: true }).select("-password -otp -otpExpiresAt -lastOtpSent");
+    
+    res.status(200).json({ message: "Profile updated successfully", vendor: updatedVendor });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
