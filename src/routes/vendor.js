@@ -1,5 +1,5 @@
 import express from "express";
-import { registerVendor, sendVendorOtp, verifyVendorOtp, getVendorProfile, updateVendorProfile } from "../controller/vendor/vendorController.js";
+import { registerVendor, sendVendorOtp, verifyVendorOtp, getVendorProfile, updateVendorProfile, getVendorLeads } from "../controller/vendor/vendorController.js";
 import { vendorAuth } from "../middleware/vendorAuth.js";
 
 const router = express.Router();
@@ -10,6 +10,7 @@ router.post("/vendor-send-otp", sendVendorOtp); //✅
 router.post("/vendor-verify-otp", verifyVendorOtp); //✅
 router.get("/get-vendor-profile", vendorAuth, getVendorProfile); //✅
 router.put("/update-vendor-profile", vendorAuth, updateVendorProfile); //✅
+router.get("/assigned-leads", vendorAuth, getVendorLeads); //✅
 
 // Example protected route
 router.get("/vendor-dashboard", vendorAuth, (req, res) => {

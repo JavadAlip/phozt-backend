@@ -48,13 +48,13 @@ export const assignLeadToGroup = async (req, res) => {
 
     // Send WhatsApp message to each member
     const sendMessages = group.members.map(async (member) => {
-      const recipient = member.whatsappNumber || member.mobile;
-      if (!recipient) {
-        console.warn(` Member ${member._id} (${member.businessName}) has no WhatsApp number`);
+      if (!member.mobile) {
+        console.warn(` Member ${member._id} (${member.businessName}) has no mobile number`);
         return;
       }
 
-      const message = ` New Lead Assigned!\n
+      const message = ` New Lead Assigned!
+
  Lead ID: ${lead._id}
  Name: ${lead.name}
  Contact: ${lead.contact}
@@ -62,18 +62,27 @@ export const assignLeadToGroup = async (req, res) => {
  Service: ${lead.requestedService}
  Event Date: ${new Date(lead.eventDate).toLocaleString()}
  Budget: ${lead.eventBudget}
- Message: ${lead.message}\n
+ Message: ${lead.message}
  Assigned to: ${member.businessName}
- Time: ${new Date().toLocaleString()}\n
+ Time: ${new Date().toLocaleString()}
+
 Please follow up as soon as possible.`;
 
-      await sendWhatsappMessage(recipient, message);
+      await sendWhatsappMessage(member.mobile, message);
     });
 
     await Promise.all(sendMessages);
 
+    // Add the lead ID to assignedLeads if not already added
+    if (!group.assignedLeads) group.assignedLeads = [];
+    if (!group.assignedLeads.includes(lead._id)) {
+      group.assignedLeads.push(lead._id);
+      await group.save();
+    }
+
     res.status(200).json({
       message: "Lead assigned successfully — WhatsApp messages sent to group members.",
+      group,
     });
 
   } catch (error) {

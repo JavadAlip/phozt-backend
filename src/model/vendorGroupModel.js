@@ -8,6 +8,7 @@ const vendorGroupSchema = new mongoose.Schema({
     required: true,
   },
   members: [{ type: mongoose.Schema.Types.ObjectId, ref: "Vendor" }],
+  assignedLeads: [{ type: mongoose.Schema.Types.ObjectId, ref: "Lead" }],
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "Admin" },
 }, { timestamps: true });
 

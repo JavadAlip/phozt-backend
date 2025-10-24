@@ -33,7 +33,7 @@ export const createVendorGroup = async (req, res) => {
     // Populate members to include businessName and contactPersonName
     const populatedGroup = await VendorGroup.findById(group._id).populate({
       path: "members",
-      select: "businessName contactPersonName email mobile", // fields to include
+      select: "businessName contactPersonName email mobile", 
     });
 
     res.status(201).json({ message: "Vendor group created successfully", group: populatedGroup });
@@ -70,9 +70,9 @@ export const getAllVendorGroups = async (req, res) => {
     const groups = await VendorGroup.find()
       .populate({
         path: "members",
-        select: "businessName contactPersonName email mobile", // fields to show
+        select: "businessName contactPersonName email mobile", 
       })
-      .sort({ createdAt: -1 }); // optional: latest first
+      .sort({ createdAt: -1 });
 
     res.status(200).json({ message: "Vendor groups fetched successfully", groups });
   } catch (error) {
@@ -90,7 +90,7 @@ export const removeMemberFromGroup = async (req, res) => {
     // Find and update group by removing vendorId from members array
     const updatedGroup = await VendorGroup.findByIdAndUpdate(
       groupId,
-      { $pull: { members: vendorId } }, // remove specific vendor
+      { $pull: { members: vendorId } }, 
       { new: true }
     ).populate({
       path: "members",
