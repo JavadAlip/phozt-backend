@@ -8,7 +8,7 @@ export const sendWhatsappMessage = async (toNumber, message) => {
   try {
     const formattedNumber = toNumber.startsWith("+") ? toNumber : `+91${toNumber}`;
     const sentMessage = await client.messages.create({
-      from: process.env.TWILIO_WHATSAPP_NUMBER, // e.g., 'whatsapp:+14155238886'
+      from: process.env.TWILIO_WHATSAPP_NUMBER, 
       to: `whatsapp:${formattedNumber}`,
       body: message,
     });
