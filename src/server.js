@@ -4,6 +4,8 @@ import mongoose from "mongoose";
 import cors from "cors";
 import adminRoutes from "./routes/admin.js";
 import vendorRoutes from "./routes/vendor.js";
+import headerRoutes from "./routes/header.js";
+import navigationRoutes from "./routes/navigation.js";
 
 dotenv.config();
 const app = express();
@@ -15,6 +17,8 @@ app.use(express.json());
 // Admin routes
 app.use("/api/admin", adminRoutes);
 app.use("/api/vendor", vendorRoutes);
+app.use("/api/header", headerRoutes);
+app.use("/api/navigation", navigationRoutes);
 
 // Test route
 app.get("/", (req, res) => {
