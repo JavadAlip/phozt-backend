@@ -5,11 +5,10 @@ import { adminAuth } from "../middleware/adminAuth.js";
 import { createLead, getLeadById, getAllLeads, deleteLead } from "../controller/leads/leadController.js";
 
 const router = express.Router();
-//✅ means successfully worked on postman
 
 // Admin login 
 router.post("/admin-login", adminLogin); //✅
-router.post("/assign-lead", adminAuth, assignLeadToGroup); 
+router.post("/assign-lead", adminAuth, assignLeadToGroup); //✅ 
 
 //lead
 router.post("/create-lead", adminAuth, createLead); //✅
@@ -31,6 +30,6 @@ router.delete("/vendor-groups/:groupId", adminAuth, deleteVendorGroup); //✅
 // Protected admin dashboard route
 router.get("/dashboard", adminAuth, (req, res) => {
     res.json({ message: "Welcome to the admin dashboard", admin: req.admin });
-});
+}); //✅ 
 
 export default router;

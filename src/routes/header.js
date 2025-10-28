@@ -16,8 +16,8 @@ router.post(
     { name: "headerImage", maxCount: 1 },
   ]),
   upsertHeader
-);
+); //✅ 
 
-router.get("/header", adminAuth, getHeader);
+router.get("/header", adminAuth, getHeader); //✅ 
 
 export default router;
