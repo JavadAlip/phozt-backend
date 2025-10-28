@@ -6,6 +6,8 @@ import adminRoutes from "./routes/admin.js";
 import vendorRoutes from "./routes/vendor.js";
 import headerRoutes from "./routes/header.js";
 import navigationRoutes from "./routes/navigation.js";
+import footerRoutes from "./routes/footer.js";
+
 
 dotenv.config();
 const app = express();
@@ -19,6 +21,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/vendor", vendorRoutes);
 app.use("/api/header", headerRoutes);
 app.use("/api/navigation", navigationRoutes);
+app.use("/api/footer", footerRoutes);
 
 // Test route
 app.get("/", (req, res) => {

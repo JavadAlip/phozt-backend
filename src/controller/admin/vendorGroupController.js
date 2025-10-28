@@ -4,13 +4,12 @@ import Vendor from "../../model/vendorAuthModel.js";
 //create-vendor-group
 export const createVendorGroup = async (req, res) => {
   try {
-    const { groupName, mainService, memberIds } = req.body;
+    const { groupName, mainService, memberIds, city } = req.body;
 
-    if (!groupName || !mainService || !memberIds || !memberIds.length) {
+    if (!groupName || !mainService || !memberIds || !memberIds.length || !city) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    // Check if all selected vendors belong to the chosen mainService
     const validVendors = await Vendor.find({
       _id: { $in: memberIds },
       vendorType: mainService,
@@ -20,23 +19,25 @@ export const createVendorGroup = async (req, res) => {
       return res.status(400).json({ message: "Some vendors do not match the selected service" });
     }
 
-    // Create group
     const group = new VendorGroup({
       groupName,
       mainService,
+      city, 
       members: memberIds,
       createdBy: req.admin._id,
     });
 
     await group.save();
 
-    // Populate members to include businessName and contactPersonName
     const populatedGroup = await VendorGroup.findById(group._id).populate({
       path: "members",
-      select: "businessName contactPersonName email mobile", 
+      select: "businessName contactPersonName email mobile",
     });
 
-    res.status(201).json({ message: "Vendor group created successfully", group: populatedGroup });
+    res.status(201).json({
+      message: "Vendor group created successfully",
+      group: populatedGroup,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -67,19 +68,30 @@ export const getVendorsByService = async (req, res) => {
 // Get-all-vendor-groups
 export const getAllVendorGroups = async (req, res) => {
   try {
-    const groups = await VendorGroup.find()
+    const { city } = req.query; 
+
+    const filter = {};
+    if (city) {
+      filter.city = city; 
+    }
+
+    const groups = await VendorGroup.find(filter)
       .populate({
         path: "members",
-        select: "businessName contactPersonName email mobile", 
+        select: "businessName contactPersonName email mobile",
       })
       .sort({ createdAt: -1 });
 
-    res.status(200).json({ message: "Vendor groups fetched successfully", groups });
+    res.status(200).json({
+      message: "Vendor groups fetched successfully",
+      groups,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 
 // Remove-member-from-group
@@ -90,7 +102,7 @@ export const removeMemberFromGroup = async (req, res) => {
     // Find and update group by removing vendorId from members array
     const updatedGroup = await VendorGroup.findByIdAndUpdate(
       groupId,
-      { $pull: { members: vendorId } }, 
+      { $pull: { members: vendorId } },
       { new: true }
     ).populate({
       path: "members",
