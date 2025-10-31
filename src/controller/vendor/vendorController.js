@@ -75,7 +75,8 @@ export const verifyVendorOtp = async (req, res) => {
     const token = jwt.sign(
       { vendorId: vendor._id, email: vendor.email },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      // { expiresIn: "1h" }
+      { expiresIn: "3d" }
     );
 
     res.status(200).json({ message: "OTP verified successfully", token });
